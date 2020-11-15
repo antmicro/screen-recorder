@@ -8,3 +8,8 @@ Simple WebRTC-based screen recorder, for making gifs.
 * [ ] keep and expand video functionality
 * [ ] add more controls
 * [ ] beautify
+* [ ] add LICENSE file
+
+## LICENSE
+
+MIT
