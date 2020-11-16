@@ -2,20 +2,11 @@
     html, body {
         margin: 0!important;
         padding: 0!important;
-        text-align: center;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-        font-size: 1em;
-    }
-
-    video {
-        width: 30%;
-        border-radius: 5px;
-        border: 1px solid black;
     }
 </style>
 
-<title>Screen Recording using RecordRTC</title>
-<h1>Screen Recording using RecordRTC</h1>
+<title>Gif Recording | RecordRTC</title>
+<h1>Simple Gif Recording using RecordRTC</h1>
 
 <br>
 
@@ -23,21 +14,12 @@
 <button id="btn-stop-recording" disabled>Stop Recording</button>
 
 <hr>
-<video controls autoplay playsinline></video>
+<img>
 
 <script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
+<script src="https://www.webrtc-experiment.com/gif-recorder.js"></script>
 <script>
-var video = document.querySelector('video');
-
-if(!navigator.getDisplayMedia && !navigator.mediaDevices.getDisplayMedia) {
-    var error = 'Your browser does NOT support the getDisplayMedia API.';
-    document.querySelector('h1').innerHTML = error;
-
-    document.querySelector('video').style.display = 'none';
-    document.getElementById('btn-start-recording').style.display = 'none';
-    document.getElementById('btn-stop-recording').style.display = 'none';
-    throw new Error(error);
-}
+var image = document.querySelector('img');
 
 function invokeGetDisplayMedia(success, error) {
     var displaymediastreamconstraints = {
@@ -75,14 +57,11 @@ function captureScreen(callback) {
 }
 
 function stopRecordingCallback() {
-    video.src = video.srcObject = null;
-    video.src = URL.createObjectURL(recorder.getBlob());
-    
+    document.querySelector('h1').innerHTML = 'Gif recording stopped: ' + bytesToSize(recorder.getBlob().size);
+    image.src = URL.createObjectURL(recorder.getBlob());
     recorder.screen.stop();
     recorder.destroy();
     recorder = null;
-
-    document.getElementById('btn-start-recording').disabled = false;
 }
 
 var recorder; // globally accessible
@@ -90,15 +69,38 @@ var recorder; // globally accessible
 document.getElementById('btn-start-recording').onclick = function() {
     this.disabled = true;
     captureScreen(function(screen) {
-        video.srcObject = screen;
-
+        document.querySelector('h1').innerHTML = 'Waiting for Gif Recorder to start...';
         recorder = RecordRTC(screen, {
-            type: 'video'
+            type: 'gif',
+            frameRate: 1,
+            quality: 10,
+            width: 1920,
+            height: 1080,
+            onGifRecordingStarted: function() {
+                document.querySelector('h1').innerHTML = 'Gif recording started.';
+            },
+            onGifPreview: function(gifURL) {
+                image.src = gifURL;
+            }
         });
+
+        /*recorder = RecordRTC(camera, {
+            type: 'gif',
+            frameRate: 1,
+            quality: 10,
+            width: 360,
+            hidden: 240,
+            onGifRecordingStarted: function() {
+                document.querySelector('h1').innerHTML = 'Gif recording started.';
+            },
+            onGifPreview: function(gifURL) {
+                image.src = gifURL;
+            }
+        });*/
 
         recorder.startRecording();
 
-        // release screen on stopRecording
+        // release camera on stopRecording
         recorder.screen = screen;
 
         document.getElementById('btn-stop-recording').disabled = false;
@@ -130,13 +132,8 @@ function addStreamStopListener(stream, callback) {
         }, false);
     });
 }
+
 </script>
 
-<br><br>
-
-<footer style="margin-top: 20px; text-align: left;">
-    <p style="padding: 5px 10px;"><b>Hints:</b> Are you using Chrome version 71? Please enable "chrome://flags/#enable-experimental-web-platform-features"</p>
-    <p style="padding: 5px 10px;"><b>Browser support:</b> Firefox, Edge and Chrome &gt= 71</p>
-    <div><small id="send-message"></small></div>
-</footer>
+<footer style="margin-top: 20px;"><small id="send-message"></small></footer>
 <script src="https://www.webrtc-experiment.com/common.js"></script>
