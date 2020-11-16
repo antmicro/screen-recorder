@@ -84,20 +84,6 @@ document.getElementById('btn-start-recording').onclick = function() {
             }
         });
 
-        /*recorder = RecordRTC(camera, {
-            type: 'gif',
-            frameRate: 1,
-            quality: 10,
-            width: 360,
-            hidden: 240,
-            onGifRecordingStarted: function() {
-                document.querySelector('h1').innerHTML = 'Gif recording started.';
-            },
-            onGifPreview: function(gifURL) {
-                image.src = gifURL;
-            }
-        });*/
-
         recorder.startRecording();
 
         // release camera on stopRecording
