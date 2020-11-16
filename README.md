@@ -1,6 +1,6 @@
 # Screen recorder
 
-Simple WebRTC-based screen recorder, for making gifs.
+Simple WebRTC-based screen recorder, for making gifs - based on [RecordRTC](https://github.com/muaz-khan/RecordRTC)
 
 ## TODO
 
