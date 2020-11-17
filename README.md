@@ -1,14 +1,16 @@
 # Screen recorder
 
-Simple WebRTC-based screen recorder, for making gifs - based on [RecordRTC](https://github.com/muaz-khan/RecordRTC)
+Simple WebRTC-based screen recorder, for making GIFs (TODO: also videos) - based on [RecordRTC](https://github.com/muaz-khan/RecordRTC)
 
-## TODO
+The reason this was created is because we wanted a one-file solution that does not need a server (since WebRTC works fine fully client-side) and is tailored to our needs (defaults, UI etc.)
 
-* [X] add gif functionality
-* [ ] keep and expand video functionality
-* [ ] add more controls
-* [ ] beautify
-* [ ] add LICENSE file
+This is an early stage work in progress tool, PRs welcome.
+
+## Usage
+
+Download ``screen-recorder.html`` and open it in the browser of your choice (unless the browser of your choice is Internet Explorer or Safari, in which case, [tough luck](https://github.com/muaz-khan/RecordRTC#browsers-support)).
+
+There is a start and stop button, and the rest is handled by the browser really, so if you've ever used Google Meet or Zoom etc., you should be fine.
 
 ## LICENSE
 
