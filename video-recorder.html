@@ -20,6 +20,9 @@
     Screen recording using RecordRTC
 </h1>
 
+<button id="btn-start-recording">Start Recording</button>
+<button id="btn-stop-recording" disabled>Stop Recording</button>
+
 <video controls autoplay playsinline style="width: 40%;"></video>
 
 <script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
@@ -80,41 +83,39 @@ function keepStreamActive(stream) {
     (document.body || document.documentElement).appendChild(video);
 }
 
-captureScreen(function(screen) {
+function captureCallback(screen) {
     keepStreamActive(screen);
 
-        screen.width = window.screen.width;
-        screen.height = window.screen.height;
-        screen.fullcanvas = true;
+    screen.width = window.screen.width;
+    screen.height = window.screen.height;
+    screen.fullcanvas = true;
 
-        var recorder = RecordRTC([screen], {
-            type: 'video',
-            mimeType: 'video/webm',
-            previewStream: function(s) {
-                document.querySelector('video').muted = true;
-                document.querySelector('video').srcObject = s;
-            }
-        });
+    var recorder = RecordRTC([screen], {
+        type: 'video',
+        mimeType: 'video/webm',
+        previewStream: function(s) {
+            document.querySelector('video').muted = true;
+            document.querySelector('video').srcObject = s;
+        }
+    });
 
-        recorder.startRecording();
+    recorder.startRecording();
 
-        window.stopCallback = function() {
-            window.stopCallback = null;
+    window.stopCallback = function() {
+        window.stopCallback = null;
 
-            recorder.stopRecording(function() {
-                var blob = recorder.getBlob();
-                document.querySelector('video').srcObject = null;
-                document.querySelector('video').src = URL.createObjectURL(blob);
-                document.querySelector('video').muted = false;
+        recorder.stopRecording(function() {
+            var blob = recorder.getBlob();
+            document.querySelector('video').srcObject = null;
+            document.querySelector('video').src = URL.createObjectURL(blob);
+            document.querySelector('video').muted = false;
 
-                screen.getTracks().forEach(function(track) {
-                    track.stop();
-                });
+            screen.getTracks().forEach(function(track) {
+                track.stop();
             });
-        };
-
-        window.timeout = setTimeout(window.stopCallback, 10 * 1000);
-});
+        });
+    };
+}
 
 function addStreamStopListener(stream, callback) {
     stream.addEventListener('ended', function() {
@@ -136,4 +137,16 @@ function addStreamStopListener(stream, callback) {
         }, false);
     });
 }
+
+document.getElementById('btn-start-recording').onclick = function() {
+    this.disabled = true;
+    captureScreen(captureCallback);
+    document.getElementById('btn-stop-recording').disabled = false;
+};
+
+document.getElementById('btn-stop-recording').onclick = function() {
+    this.disabled = true;
+    window.stopCallback();
+};
+
 </script>
