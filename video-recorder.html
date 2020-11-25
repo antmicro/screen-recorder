@@ -106,9 +106,12 @@ function captureCallback(screen) {
 
         recorder.stopRecording(function() {
             var blob = recorder.getBlob();
+            var fileURL = URL.createObjectURL(blob);
             document.querySelector('video').srcObject = null;
-            document.querySelector('video').src = URL.createObjectURL(blob);
+            document.querySelector('video').src = fileURL;
             document.querySelector('video').muted = false;
+
+            promptDownload(fileURL);
 
             screen.getTracks().forEach(function(track) {
                 track.stop();
@@ -136,6 +139,16 @@ function addStreamStopListener(stream, callback) {
             callback = function() {};
         }, false);
     });
+}
+
+function promptDownload(fileURL) {
+    var ancorTag = document.createElement('a');
+    ancorTag.href = fileURL;
+    ancorTag.target = '_blank';
+    ancorTag.download = "screen_recording";
+    document.body.appendChild(ancorTag);
+    ancorTag.click();
+    document.body.removeChild(ancorTag);
 }
 
 document.getElementById('btn-start-recording').onclick = function() {
