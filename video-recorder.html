@@ -61,14 +61,14 @@ function invokeGetDisplayMedia(success, error) {
 }
 
 function captureScreen(callback) {
-    invokeGetDisplayMedia(function(screen) {
-        addStreamStopListener(screen, function() {
+    invokeGetDisplayMedia(function(target) {
+        addStreamStopListener(target, function() {
             if(window.stopCallback) {
                 window.stopCallback();
             }
 
         });
-        callback(screen);
+        callback(target);
     }, function(error) {
         console.error(error);
         alert('Unable to capture your screen. Please check console logs.\n' + error);
@@ -83,14 +83,14 @@ function keepStreamActive(stream) {
     (document.body || document.documentElement).appendChild(video);
 }
 
-function captureCallback(screen) {
-    keepStreamActive(screen);
+function captureCallback(target) {
+    keepStreamActive(target);
 
-    screen.width = window.screen.width;
-    screen.height = window.screen.height;
-    screen.fullcanvas = true;
+    target.width = window.screen.width;
+    target.height = window.screen.height;
+    target.fullcanvas = true;
 
-    var recorder = RecordRTC([screen], {
+    var recorder = RecordRTC([target], {
         type: 'video',
         mimeType: 'video/webm',
         previewStream: function(s) {
@@ -113,7 +113,7 @@ function captureCallback(screen) {
 
             promptDownload(fileURL);
 
-            screen.getTracks().forEach(function(track) {
+            target.getTracks().forEach(function(track) {
                 track.stop();
             });
         });
