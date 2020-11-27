@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link href="/static/build/styles/samples.37902ba3b7fe.css" rel="stylesheet" type="text/css" />
+  <title>Using the Screen Capture API - Simple_screen_capture - code sample</title>
+  <style type="text/css">
+    #video {
+      border: 1px solid #999;
+      width: 98%;
+      max-width: 860px;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .warn {
+      color: orange;
+    }
+
+    .info {
+      color: darkgreen;
+    }
+  </style>
+</head>
+<body>
+  <p>This example shows you the contents of the selected part of your display. Click the Start Capture button to begin.</p>
+  <p><button id="start">Start Capture</button> <button id="stop">Stop Capture</button></p>
+  <video id="video" autoplay></video>
+  <br>
+  <strong>Log:</strong>
+  <br>
+  <pre id="log"></pre>
+
+  <script>
+    const videoElem = document.getElementById("video");
+    const logElem = document.getElementById("log");
+    const startElem = document.getElementById("start");
+    const stopElem = document.getElementById("stop");
+
+    var displayMediaOptions = {
+      video: {
+        cursor: "always"
+      },
+      audio: false
+    };
+
+    startElem.addEventListener("click", function(evt) {
+      startCapture();
+    }, false);
+
+    stopElem.addEventListener("click", function(evt) {
+      stopCapture();
+    }, false);
+
+    console.log = msg => logElem.innerHTML += `${msg}<br>`;
+    console.error = msg => logElem.innerHTML += `<span class="error">${msg}</span><br>`;
+    console.warn = msg => logElem.innerHTML += `<span class="warn">${msg}<span><br>`;
+    console.info = msg => logElem.innerHTML += `<span class="info">${msg}</span><br>`;
+
+    async function startCapture() {
+      logElem.innerHTML = "";
+
+      try {
+        videoElem.srcObject = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+        dumpOptionsInfo();
+      } catch (err) {
+        console.error("Error: " + err);
+      }
+    }
+
+    function stopCapture(evt) {
+      let tracks = videoElem.srcObject.getTracks();
+      tracks.forEach(track => track.stop());
+      videoElem.srcObject = null;
+    }
+
+    function dumpOptionsInfo() {
+      const videoTrack = videoElem.srcObject.getVideoTracks()[0];
+
+      console.info("Track settings:");
+      console.info(JSON.stringify(videoTrack.getSettings(), null, 2));
+      console.info("Track constraints:");
+      console.info(JSON.stringify(videoTrack.getConstraints(), null, 2));
+    }
+  </script>
+</body>
+</html>
