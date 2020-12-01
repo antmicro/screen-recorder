@@ -23,15 +23,17 @@
 <button id="btn-start-recording">Start Recording</button>
 <button id="btn-stop-recording" disabled>Stop Recording</button>
 
-<video controls autoplay playsinline style="width: 40%;"></video>
+<video controls autoplay playsinline></video>
 
 <script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
 <script>
+var video = document.querySelector('video');
+
 if(!navigator.getDisplayMedia && !navigator.mediaDevices.getDisplayMedia) {
     var error = 'Your browser does NOT supports getDisplayMedia API.';
     document.querySelector('h1').innerHTML = error;
 
-    document.querySelector('video').style.display = 'none';
+    video.style.display = 'none';
     document.getElementById('btn-start-recording').style.display = 'none';
     document.getElementById('btn-stop-recording').style.display = 'none';
     throw new Error(error);
@@ -75,28 +77,12 @@ function captureScreen(callback) {
     });
 }
 
-function keepStreamActive(stream) {
-    var video = document.createElement('video');
-    video.muted = true;
-    video.srcObject = stream;
-    video.style.display = 'none';
-    (document.body || document.documentElement).appendChild(video);
-}
-
 function captureCallback(target) {
-    keepStreamActive(target);
-
-    target.width = window.screen.width;
-    target.height = window.screen.height;
-    target.fullcanvas = true;
+    video.srcObject = target;
 
     var recorder = RecordRTC(target, {
         type: 'video',
-        mimeType: 'video/webm',
-        previewStream: function(s) {
-            document.querySelector('video').muted = true;
-            document.querySelector('video').srcObject = s;
-        }
+        mimeType: 'video/webm'
     });
 
     recorder.startRecording();
@@ -107,15 +93,13 @@ function captureCallback(target) {
         recorder.stopRecording(function() {
             var blob = recorder.getBlob();
             var fileURL = URL.createObjectURL(blob);
-            document.querySelector('video').srcObject = null;
-            document.querySelector('video').src = fileURL;
-            document.querySelector('video').muted = false;
+            video.srcObject = null;
+            video.src = fileURL;
 
-            promptDownload(fileURL);
-
-            target.getTracks().forEach(function(track) {
-                track.stop();
-            });
+            target.stop();
+            recorder.save("screen_recording");
+            recorder.destroy();
+            recorder = null;
         });
     };
 }
@@ -139,16 +123,6 @@ function addStreamStopListener(stream, callback) {
             callback = function() {};
         }, false);
     });
-}
-
-function promptDownload(fileURL) {
-    var ancorTag = document.createElement('a');
-    ancorTag.href = fileURL;
-    ancorTag.target = '_blank';
-    ancorTag.download = "screen_recording";
-    document.body.appendChild(ancorTag);
-    ancorTag.click();
-    document.body.removeChild(ancorTag);
 }
 
 document.getElementById('btn-start-recording').onclick = function() {
