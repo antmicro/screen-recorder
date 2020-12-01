@@ -90,7 +90,7 @@ function captureCallback(screen) {
     screen.height = window.screen.height;
     screen.fullcanvas = true;
 
-    var recorder = RecordRTC([screen], {
+    var recorder = RecordRTC(screen, {
         type: 'video',
         mimeType: 'video/webm',
         previewStream: function(s) {
