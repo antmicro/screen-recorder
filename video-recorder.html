@@ -1,12 +1,17 @@
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
 
 <style>
     html, body {
-        margin: 0!important;
-        padding: 0!important;
+        margin: 0;
+        padding: 0;
         text-align: center;
         font-size: 1em;
+        font-family: 'Lato', sans-serif;
     }
-
+    h1, #controls, video {
+        margin: auto;
+        margin-top: 20px;
+    }
     video {
         width: 30%;
         border-radius: 5px;
@@ -20,10 +25,12 @@
     Screen recording using RecordRTC
 </h1>
 
-<button id="btn-start-recording">Start Recording</button>
-<button id="btn-stop-recording" disabled>Stop Recording</button>
-
 <video controls autoplay playsinline></video>
+
+<div id="controls">
+    <button id="btn-start-recording">Start Recording</button>
+    <button id="btn-stop-recording" disabled>Stop Recording</button>
+</div>
 
 <script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
 <script>
