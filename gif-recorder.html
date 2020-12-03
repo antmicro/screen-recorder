@@ -45,21 +45,45 @@ function invokeGetDisplayMedia(success, error) {
 }
 
 function captureScreen(callback) {
-    invokeGetDisplayMedia(function(screen) {
-        addStreamStopListener(screen, function() {
+    invokeGetDisplayMedia(function(target) {
+        addStreamStopListener(target, function() {
             document.getElementById('btn-stop-recording').click();
         });
-        callback(screen);
+        callback(target);
     }, function(error) {
         console.error(error);
         alert('Unable to capture your screen. Please check console logs.\n' + error);
     });
 }
 
+function startRecordingCallback(target) {
+  document.querySelector('h1').innerHTML = 'Waiting for Gif Recorder to start...';
+  recorder = RecordRTC(target, {
+      type: 'gif',
+      frameRate: 1,
+      quality: 10,
+      width: 1920,
+      height: 1080,
+      onGifRecordingStarted: function() {
+          document.querySelector('h1').innerHTML = 'Gif recording started.';
+      },
+      onGifPreview: function(gifURL) {
+          image.src = gifURL;
+      }
+  });
+
+  recorder.startRecording();
+
+  // release camera on stopRecording
+  recorder.target = target;
+
+  document.getElementById('btn-stop-recording').disabled = false;
+}
+
 function stopRecordingCallback() {
     document.querySelector('h1').innerHTML = 'Gif recording stopped: ' + bytesToSize(recorder.getBlob().size);
     image.src = URL.createObjectURL(recorder.getBlob());
-    recorder.screen.stop();
+    recorder.target.stop();
     recorder.destroy();
     recorder = null;
 }
@@ -68,29 +92,7 @@ var recorder; // globally accessible
 
 document.getElementById('btn-start-recording').onclick = function() {
     this.disabled = true;
-    captureScreen(function(screen) {
-        document.querySelector('h1').innerHTML = 'Waiting for Gif Recorder to start...';
-        recorder = RecordRTC(screen, {
-            type: 'gif',
-            frameRate: 1,
-            quality: 10,
-            width: 1920,
-            height: 1080,
-            onGifRecordingStarted: function() {
-                document.querySelector('h1').innerHTML = 'Gif recording started.';
-            },
-            onGifPreview: function(gifURL) {
-                image.src = gifURL;
-            }
-        });
-
-        recorder.startRecording();
-
-        // release camera on stopRecording
-        recorder.screen = screen;
-
-        document.getElementById('btn-stop-recording').disabled = false;
-    });
+    captureScreen(startRecordingCallback);
 };
 
 document.getElementById('btn-stop-recording').onclick = function() {

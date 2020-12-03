@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Video to gif converter</title>
+  </head>
+  <body>
+
+  <h1>Video to gif converter</h1>
+  <p>Please upload file to convert: </p>
+  <p><input type="file" id="uploader"></p>
+  <p id="message" />
+
+  <script src='https://unpkg.com/@ffmpeg/ffmpeg@0.9.5/dist/ffmpeg.min.js'></script>
+  <script>
+    function promptDownload(fileURL) {
+      var ancorTag = document.createElement('a');
+      ancorTag.href = fileURL;
+      ancorTag.target = '_blank';
+      ancorTag.download = "converted_video.gif";
+      document.body.appendChild(ancorTag);
+      ancorTag.click();
+      document.body.removeChild(ancorTag);
+    }
+
+    const message = document.getElementById('message');
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({
+      log: true,
+      progress: ({ ratio }) => {
+        if(!isNaN(ratio)) {
+          message.innerHTML = `Complete: ${(ratio * 100.0).toFixed(2)}%`;
+        }
+        else {
+          if(message.innerHTML == "/") {
+            message.innerHTML = "-";
+          }
+          else if(message.innerHTML == "-") {
+            message.innerHTML = "\\";
+          }
+          else {
+            message.innerHTML = "/";
+          }
+        }
+      }
+    });
+
+    const convert = async ({ target: { files } }) => {
+      const { name } = files[0];
+      if(!ffmpeg.isLoaded()) {
+        message.innerHTML = 'Loading ffmpeg-core.js';
+        await ffmpeg.load();
+      }
+      message.innerHTML = 'Start converting';
+      ffmpeg.FS('writeFile', name, await fetchFile(files[0]));
+      await ffmpeg.run('-i', name,  'output.gif');
+      message.innerHTML = 'Complete converting';
+      const data = ffmpeg.FS('readFile', 'output.gif');
+      const blob = new Blob([data.buffer], { type: 'image/gif' });
+      const fileUrl = URL.createObjectURL(blob);
+      promptDownload(fileUrl);
+    }
+    document.getElementById('uploader').addEventListener('change', convert);
+  </script>
+  </body>
+</html>
