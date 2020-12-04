@@ -6,7 +6,7 @@ The reason this was created is because we wanted a one-file solution that does n
 
 This is an early stage work in progress tool, PRs welcome.
 
-Aagain, GIFs do not fully work yet, sadly.
+Again, GIFs do not fully work yet, sadly.
 
 ## Usage (online)
 
@@ -14,14 +14,19 @@ Open:
 
 * [video-recorder](./video-recorder.html)
 * [gif-recorder](./gif-recorder.html)
+* [video2gif (Chrome only)](./video2gif.html)
 
 And enjoy.
 
-There is a start and stop button, and the rest is handled by the browser really, so if you've ever used Google Meet or Zoom etc., you should be fine.
+As for recorders, there is a start and stop button, and the rest is handled by the browser really, so if you've ever used Google Meet or Zoom etc., you should be fine.
+
+To use the converter, upload file with the button. When the conversion is finished, the result downloads automatically.
 
 ## Usage (local)
 
 Download ``{video,gif}-recorder.html`` and open it in the browser of your choice (unless the browser of your choice is Internet Explorer or Safari, in which case, [tough luck](https://github.com/muaz-khan/RecordRTC#browsers-support)). Rest is same as above.
+
+You can also download ``video2gif.html``, but it is only guaranteed to work in Chrome.
 
 ## LICENSE
 
