@@ -104,7 +104,7 @@ function captureCallback(target) {
             video.src = fileURL;
 
             target.stop();
-            recorder.save("screen_recording");
+            recorder.save("screen_recording.webm");
             recorder.destroy();
             recorder = null;
         });
