@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Screen recording using RecordRTC</title>
+  <style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-size: 1em;
+    font-family: 'Lato', sans-serif;
+  }
+
+  h1, #controls, video {
+    margin: auto;
+    margin-top: 20px;
+  }
+
+  video {
+    width: 30%;
+    border-radius: 5px;
+    border: 1px solid black;
+  }
+
+  /* The switch - the box around the slider */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+
+  /* Hide default HTML checkbox */
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  /* The slider */
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+  #options {
+    display: table;
+    margin: 50px auto 0px;
+  }
+
+  .option {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 0px 15px;
+  }
+  </style>
+</head>
+<body>
+  <h1>
+    Screen recording using RecordRTC
+  </h1>
+
+  <div id="options">
+    <span class="option">webm video</span>
+    <label class="switch">
+      <!-- <input id="convert-to-gif" type="checkbox"> -->
+      <span class="slider round"></span>
+    </label>
+    <span class="option">gif (Chrome only)</span>
+  </div>
+
+  <video controls autoplay playsinline></video>
+
+  <div id="controls">
+    <button id="btn-start-recording">Start Recording</button>
+    <button id="btn-stop-recording" disabled>Stop Recording</button>
+  </div>
+  <p id="message" />
+
+  <script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
+  <script src='https://unpkg.com/@ffmpeg/ffmpeg@0.9.5/dist/ffmpeg.min.js'></script>
+  <script>
+  const video = document.querySelector('video');
+  const message = document.getElementById('message');
+  const { createFFmpeg, fetchFile } = FFmpeg;
+  const ffmpeg = createFFmpeg({
+    log: true,
+    progress: showProgress
+  });
+
+  if(!navigator.getDisplayMedia && !navigator.mediaDevices.getDisplayMedia) {
+    var error = 'Your browser does NOT supports getDisplayMedia API.';
+    document.querySelector('h1').innerHTML = error;
+
+    video.style.display = 'none';
+    document.getElementById('btn-start-recording').style.display = 'none';
+    document.getElementById('btn-stop-recording').style.display = 'none';
+    throw new Error(error);
+  }
+
+  function invokeGetDisplayMedia(success, error) {
+    var displaymediastreamconstraints = {
+      video: {
+        displaySurface: 'monitor', // monitor, window, application, browser
+        logicalSurface: true,
+        cursor: 'always' // never, always, motion
+      }
+    };
+
+    // above constraints are NOT supported YET
+    // that's why overridnig them
+    displaymediastreamconstraints = {
+      video: true
+    };
+
+    if(navigator.mediaDevices.getDisplayMedia) {
+      navigator.mediaDevices.getDisplayMedia(displaymediastreamconstraints).then(success).catch(error);
+    }
+    else {
+      navigator.getDisplayMedia(displaymediastreamconstraints).then(success).catch(error);
+    }
+  }
+
+  function captureScreen(callback) {
+    invokeGetDisplayMedia(function(target) {
+      addStreamStopListener(target, function() {
+        if(window.stopCallback) {
+          window.stopCallback();
+        }
+
+      });
+      callback(target);
+    }, function(error) {
+      console.error(error);
+      alert('Unable to capture your screen. Please check console logs.\n' + error);
+    });
+  }
+
+  function captureCallback(target) {
+    video.srcObject = target;
+    const checkbox = document.getElementById("convert-to-gif");
+    checkbox.disabled = true;
+
+    var recorder = RecordRTC(target, {
+      type: 'video',
+      mimeType: 'video/webm'
+    });
+
+    recorder.startRecording();
+
+    window.stopCallback = function() {
+      window.stopCallback = null;
+
+      recorder.stopRecording(function() {
+        var blob = recorder.getBlob();
+        var fileUrl = URL.createObjectURL(blob);
+        video.srcObject = null;
+        video.src = fileUrl;
+
+        target.stop();
+        if(checkbox.checked === true) {
+          convert(fileUrl).then(() => { checkbox.disabled = false });
+        } else {
+          recorder.save("screen_recording.webm");
+          checkbox.disabled = false;
+        }
+        recorder.destroy();
+        recorder = null;
+      });
+    };
+  }
+
+  function addStreamStopListener(stream, callback) {
+    stream.addEventListener('ended', function() {
+      callback();
+      callback = function() {};
+    }, false);
+    stream.addEventListener('inactive', function() {
+      callback();
+      callback = function() {};
+    }, false);
+    stream.getTracks().forEach(function(track) {
+      track.addEventListener('ended', function() {
+        callback();
+        callback = function() {};
+      }, false);
+      track.addEventListener('inactive', function() {
+        callback();
+        callback = function() {};
+      }, false);
+    });
+  }
+
+  document.getElementById('btn-start-recording').onclick = function() {
+    this.disabled = true;
+    captureScreen(captureCallback);
+    document.getElementById('btn-stop-recording').disabled = false;
+  };
+
+  document.getElementById('btn-stop-recording').onclick = function() {
+    this.disabled = true;
+    window.stopCallback();
+  };
+
+  function promptDownload(fileURL) {
+    var ancorTag = document.createElement('a');
+    ancorTag.href = fileURL;
+    ancorTag.target = '_blank';
+    ancorTag.download = "converted_video.gif";
+    document.body.appendChild(ancorTag);
+    ancorTag.click();
+    document.body.removeChild(ancorTag);
+  }
+
+  function showProgress({ ratio }) {
+    if(!isNaN(ratio)) {
+      message.innerHTML = `Complete: ${(ratio * 100.0).toFixed(2)}%`;
+    }
+    else {
+      if(message.innerHTML == "/") {
+        message.innerHTML = "-";
+      }
+      else if(message.innerHTML == "-") {
+        message.innerHTML = "\\";
+      }
+      else {
+        message.innerHTML = "/";
+      }
+    }
+  }
+
+  const convert = async (sourceFileUrl) => {
+    if(!ffmpeg.isLoaded()) {
+      message.innerHTML = 'Loading ffmpeg-core.js';
+      await ffmpeg.load();
+    }
+    message.innerHTML = 'Start converting';
+    ffmpeg.FS('writeFile', "recording", await fetchFile(sourceFileUrl ));
+    await ffmpeg.run('-i', "recording",  'output.gif');
+    message.innerHTML = 'Complete converting';
+    const data = ffmpeg.FS('readFile', 'output.gif');
+    const blob = new Blob([data.buffer], { type: 'image/gif' });
+    const fileUrl = URL.createObjectURL(blob);
+    promptDownload(fileUrl);
+  }
+  </script>
+</body>
+</html>
