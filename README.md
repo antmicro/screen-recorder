@@ -26,7 +26,7 @@ To use the converter, upload file with the button. When the conversion is finish
 
 Download ``{video,gif}-recorder.html`` and open it in the browser of your choice (unless the browser of your choice is Internet Explorer or Safari, in which case, [tough luck](https://github.com/muaz-khan/RecordRTC#browsers-support)). Rest is same as above.
 
-You can also download ``video2gif.html``, but it is only guaranteed to work in Chrome.
+You can also download ``video2gif.html``, but it is guaranteed to work only in Chrome.
 
 ## LICENSE
 
