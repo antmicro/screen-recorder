@@ -12,8 +12,7 @@ Again, GIFs do not fully work yet, sadly.
 
 Open:
 
-* [video-recorder](./video-recorder.html)
-* [gif-recorder](./gif-recorder.html)
+* [screen-recorder](./screen-recorder.html)
 * [video2gif (Chrome only)](./video2gif.html)
 
 And enjoy.
