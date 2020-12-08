@@ -53,7 +53,7 @@
       }
       message.innerHTML = 'Start converting';
       ffmpeg.FS('writeFile', name, await fetchFile(files[0]));
-      await ffmpeg.run('-i', name,  'output.gif');
+      await ffmpeg.run('-i', name, '-vf', 'fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse', 'output.gif');
       message.innerHTML = 'Complete converting';
       const data = ffmpeg.FS('readFile', 'output.gif');
       const blob = new Blob([data.buffer], { type: 'image/gif' });
