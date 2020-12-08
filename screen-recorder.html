@@ -278,8 +278,8 @@
       await ffmpeg.load();
     }
     message.innerHTML = 'Start converting';
-    ffmpeg.FS('writeFile', "recording", await fetchFile(sourceFileUrl ));
-    await ffmpeg.run('-i', "recording",  'output.gif');
+    ffmpeg.FS('writeFile', 'recording', await fetchFile(sourceFileUrl));
+    await ffmpeg.run('-i', 'recording', '-vf', 'fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse', 'output.gif');
     message.innerHTML = 'Complete converting';
     const data = ffmpeg.FS('readFile', 'output.gif');
     const blob = new Blob([data.buffer], { type: 'image/gif' });
