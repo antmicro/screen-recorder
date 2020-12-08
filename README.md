@@ -1,6 +1,6 @@
 # Screen recorder
 
-Antmicro's simple WebRTC-based screen recorder, for making videos or GIFs - based on [RecordRTC](https://github.com/muaz-khan/RecordRTC)
+Antmicro's simple WebRTC-based screen recorder, for making videos or GIFs - based on [RecordRTC](https://github.com/muaz-khan/RecordRTC) and [ffmpeg.wasm](https://github.com/ffmpegwasm/ffmpeg.wasm).
 
 The reason this was created is because we wanted a one-file solution that does not need a server (since WebRTC works fine fully client-side) and is tailored to our needs (defaults, UI etc.)
 
