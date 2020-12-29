@@ -25,6 +25,10 @@ Download ``screen-recorder.html`` and open it in the browser of your choice (unl
 
 To record directly as a GIF or use ``video2gif.html``, please use Chrome.
 
+## Future ideas
+
+* [Add subtitle capabilities](https://nickcanzoneri.com/ffmpeg/gif/2018/11/20/captioned-gifs-with-ffmpeg.html)
+
 ## LICENSE
 
 MIT
