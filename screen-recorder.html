@@ -246,13 +246,13 @@
   };
 
   function promptDownload(fileURL) {
-    var ancorTag = document.createElement('a');
-    ancorTag.href = fileURL;
-    ancorTag.target = '_blank';
-    ancorTag.download = "converted_video.gif";
-    document.body.appendChild(ancorTag);
-    ancorTag.click();
-    document.body.removeChild(ancorTag);
+    var anchorTag = document.createElement('a');
+    anchorTag.href = fileURL;
+    anchorTag.target = '_blank';
+    anchorTag.download = "converted_video.gif";
+    document.body.appendChild(anchorTag);
+    anchorTag.click();
+    document.body.removeChild(anchorTag);
   }
 
   function showProgress({ ratio }) {
