@@ -23,7 +23,7 @@
     border: 1px solid black;
   }
 
-  /* The switch - the box around the slider */
+  /* The switch - the box around the slider *
   .switch {
     position: relative;
     display: inline-block;
@@ -280,7 +280,7 @@
     message.innerHTML = 'Start converting';
     ffmpeg.FS('writeFile', 'recording', await fetchFile(sourceFileUrl));
     await ffmpeg.run('-i', 'recording', '-vf', 'fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse', 'output.gif');
-    message.innerHTML = 'Complete converting';
+    message.innerHTML = 'Conversion complete.';
     const data = ffmpeg.FS('readFile', 'output.gif');
     const blob = new Blob([data.buffer], { type: 'image/gif' });
     const fileUrl = URL.createObjectURL(blob);
